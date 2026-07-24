@@ -22,10 +22,10 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   title: {
-    default: 'wacrm',
-    template: '%s — wacrm',
+    default: 'Saheli Fashion',
+    template: '%s — Saheli Fashion',
   },
-  description: 'Self-hostable CRM template for WhatsApp.',
+  description: 'Fashion retail management — CRM, WhatsApp, and collections.',
   robots: {
     index: false,
     follow: false,
@@ -41,7 +41,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: '#020617',
+  themeColor: '#be185d',
   colorScheme: 'dark light',
 };
 

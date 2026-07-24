@@ -14,7 +14,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { MessageSquare, CheckCircle, UsersRound } from 'lucide-react';
+import { Sparkles, CheckCircle, UsersRound } from 'lucide-react';
 
 // `useSearchParams` opts the component out of static prerendering
 // unless wrapped in Suspense — same pattern as /login.
@@ -135,7 +135,7 @@ function SignupPageInner() {
             {inviteToken ? (
               <UsersRound className="text-primary h-6 w-6" />
             ) : (
-              <MessageSquare className="text-primary h-6 w-6" />
+              <Sparkles className="text-primary h-6 w-6" />
             )}
           </div>
           <CardTitle className="text-foreground text-xl">
@@ -144,7 +144,7 @@ function SignupPageInner() {
           <CardDescription className="text-muted-foreground">
             {inviteToken
               ? 'Verify your email, then accept the invitation to join your team.'
-              : 'Get started with CRM Template for WhatsApp'}
+              : 'Get started with Saheli Fashion'}
           </CardDescription>
         </CardHeader>
         <CardContent>

@@ -13,7 +13,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { MessageSquare, CheckCircle, ArrowLeft } from 'lucide-react';
+import { Sparkles, CheckCircle, ArrowLeft } from 'lucide-react';
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState('');
@@ -78,7 +78,7 @@ export default function ForgotPasswordPage() {
       <Card className="border-border bg-card w-full max-w-md">
         <CardHeader className="items-center text-center">
           <div className="bg-primary/10 mb-2 flex h-12 w-12 items-center justify-center rounded-xl">
-            <MessageSquare className="text-primary h-6 w-6" />
+            <Sparkles className="text-primary h-6 w-6" />
           </div>
           <CardTitle className="text-foreground text-xl">
             Reset password
