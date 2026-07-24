@@ -8,6 +8,7 @@ import {
 import { HANDOFF_SENTINEL, aiRequestTimeoutMs } from './defaults';
 import { generateOpenAi } from './providers/openai';
 import { generateAnthropic } from './providers/anthropic';
+import { generateGroq } from './providers/groq';
 
 export interface GenerateArgs {
   config: AiConfig;
@@ -42,6 +43,9 @@ export async function generateReply(
       break;
     case 'anthropic':
       result = await generateAnthropic(providerArgs);
+      break;
+    case 'groq':
+      result = await generateGroq(providerArgs);
       break;
     default:
       throw new AiError(`Unsupported AI provider: ${config.provider}`, {
