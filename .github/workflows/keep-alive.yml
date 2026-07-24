@@ -1,0 +1,24 @@
+name: Keep Alive
+
+on:
+  schedule:
+    - cron: '*/10 * * * *'
+  workflow_dispatch:
+
+jobs:
+  ping:
+    name: Ping site + Supabase
+    runs-on: ubuntu-latest
+    steps:
+      - name: Call keep-alive endpoint
+        run: |
+          curl -s -o /dev/null -w "%{http_code}" \
+            "https://wacrm-sahelifashion.vercel.app/api/keep-alive" \
+            || echo "keep-alive endpoint not reachable"
+
+      - name: Direct Supabase query
+        run: |
+          curl -s -o /dev/null -w "%{http_code}" \
+            -H "apikey: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}" \
+            "${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}/rest/v1/profiles?select=id&limit=1" \
+            || echo "Supabase direct query failed"
