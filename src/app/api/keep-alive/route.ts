@@ -8,7 +8,10 @@ export async function GET() {
   const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
   if (!supabaseUrl || !serviceKey) {
-    return NextResponse.json({ ok: false, reason: 'missing env' }, { status: 500 });
+    return NextResponse.json(
+      { ok: false, reason: 'missing env' },
+      { status: 500 }
+    );
   }
 
   try {

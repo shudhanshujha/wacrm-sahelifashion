@@ -18,12 +18,37 @@ const CONFIG_COLUMNS =
   'provider, model, api_key, system_prompt, is_active, auto_reply_enabled, auto_reply_max_per_conversation, handoff_agent_id, embeddings_api_key';
 
 /**
+ * When the account has no DB row, fall back to the `GROQ_API_KEY` env var
+ * so the app works out of the box for single-tenant deployments without
+ * visiting Settings → AI Assistant. Set `GROQ_API_KEY` and optionally
+ * `GROQ_MODEL` (default: `llama-3.3-70b-versatile`) on Vercel.
+ */
+function envFallbackConfig(): AiConfig | null {
+  const apiKey = process.env.GROQ_API_KEY;
+  if (!apiKey) return null;
+  return {
+    provider: 'groq',
+    model: process.env.GROQ_MODEL || 'llama-3.3-70b-versatile',
+    apiKey,
+    systemPrompt: null,
+    isActive: true,
+    autoReplyEnabled: false,
+    autoReplyMaxPerConversation: 3,
+    handoffAgentId: null,
+    embeddingsApiKey: null,
+  };
+}
+
+/**
  * Load and decrypt the account's AI config for *use* (draft or
  * auto-reply). Returns `null` when there's no row or the master switch
  * (`is_active`) is off — both mean "AI is not available", which callers
- * treat identically. Throws only if the stored key can't be decrypted
- * (mismatched `ENCRYPTION_KEY`), so that distinct failure surfaces
- * rather than looking like "not configured".
+ * treat identically. Falls back to the `GROQ_API_KEY` env var for
+ * single-tenant deployments that skip the Settings UI.
+ *
+ * Throws only if the stored key can't be decrypted (mismatched
+ * `ENCRYPTION_KEY`), so that distinct failure surfaces rather than
+ * looking like "not configured".
  *
  * Works with any client: pass the RLS-scoped SSR client from a
  * dashboard route, or the service-role admin client from the webhook.
@@ -41,16 +66,17 @@ export async function loadAiConfig(
     .maybeSingle();
 
   if (error) throw error;
-  if (!data) return null;
+
+  if (!data) return envFallbackConfig();
 
   const row = data as AiConfigRow;
   // The Playground passes requireActive:false so an admin can test the
   // agent before flipping the master switch on.
-  if (requireActive && !row.is_active) return null;
+  if (requireActive && !row.is_active) return envFallbackConfig();
   // Defensive: the column is NOT NULL, but a partial write / manual DB
   // edit could leave it empty. Treat a missing key as "not configured"
   // rather than letting decrypt() throw on null.
-  if (!row.api_key) return null;
+  if (!row.api_key) return envFallbackConfig();
 
   // The embeddings key is optional and independent of the chat key —
   // a corrupt/undecryptable one should downgrade to lexical KB, not
