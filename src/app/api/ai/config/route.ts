@@ -13,6 +13,7 @@ import { encrypt, decrypt } from '@/lib/whatsapp/encryption';
 import { validateAiCredentials } from '@/lib/ai/validate';
 import { embedTexts } from '@/lib/ai/embeddings';
 import { AiError, type AiProvider } from '@/lib/ai/types';
+import { envFallbackConfig } from '@/lib/ai/config';
 
 function bad(message: string) {
   return NextResponse.json({ error: message }, { status: 400 });
@@ -47,7 +48,23 @@ export async function GET() {
       );
     }
 
-    if (!data) return NextResponse.json({ configured: false });
+    if (!data) {
+      const fallback = envFallbackConfig();
+      if (fallback)
+        return NextResponse.json({
+          configured: true,
+          provider: fallback.provider,
+          model: fallback.model,
+          system_prompt: null,
+          is_active: fallback.isActive,
+          auto_reply_enabled: fallback.autoReplyEnabled,
+          auto_reply_max_per_conversation: fallback.autoReplyMaxPerConversation,
+          handoff_agent_id: null,
+          has_key: true,
+          has_embeddings_key: false,
+        });
+      return NextResponse.json({ configured: false });
+    }
     // The keys are selected only to derive the has_* flags; neither is
     // returned to the client.
     const { api_key, embeddings_api_key, ...safe } = data;
@@ -157,6 +174,8 @@ export async function POST(request: Request) {
           'Stored API key could not be decrypted — re-enter your key.'
         );
       }
+    } else if (process.env.GROQ_API_KEY) {
+      apiKeyPlain = process.env.GROQ_API_KEY;
     } else {
       return bad('api_key is required');
     }

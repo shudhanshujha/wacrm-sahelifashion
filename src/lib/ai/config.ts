@@ -23,7 +23,7 @@ const CONFIG_COLUMNS =
  * visiting Settings → AI Assistant. Set `GROQ_API_KEY` and optionally
  * `GROQ_MODEL` (default: `llama-3.3-70b-versatile`) on Vercel.
  */
-function envFallbackConfig(): AiConfig | null {
+export function envFallbackConfig(): AiConfig | null {
   const apiKey = process.env.GROQ_API_KEY;
   if (!apiKey) return null;
   return {

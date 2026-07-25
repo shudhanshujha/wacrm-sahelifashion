@@ -57,19 +57,23 @@ export async function POST(request: Request) {
         .select('api_key')
         .eq('account_id', accountId)
         .maybeSingle();
-      if (!existing?.api_key) {
+      if (existing?.api_key) {
+        try {
+          apiKeyPlain = decrypt(existing.api_key);
+        } catch {
+          return NextResponse.json(
+            {
+              error:
+                'Stored API key could not be decrypted — re-enter your key.',
+            },
+            { status: 400 }
+          );
+        }
+      } else if (process.env.GROQ_API_KEY) {
+        apiKeyPlain = process.env.GROQ_API_KEY;
+      } else {
         return NextResponse.json(
           { error: 'Enter an API key to test.' },
-          { status: 400 }
-        );
-      }
-      try {
-        apiKeyPlain = decrypt(existing.api_key);
-      } catch {
-        return NextResponse.json(
-          {
-            error: 'Stored API key could not be decrypted — re-enter your key.',
-          },
           { status: 400 }
         );
       }
